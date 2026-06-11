@@ -1,0 +1,20 @@
+package models;
+
+public class Transaction {
+
+    private String type;
+    private double amount;
+
+    // Constructor
+    public Transaction(String type, double amount) {
+
+        this.type = type;
+        this.amount = amount;
+    }
+
+    // Display Transaction
+    public void displayTransaction() {
+
+        System.out.println(type + " : " + amount);
+    }
+}

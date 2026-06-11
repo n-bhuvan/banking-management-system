@@ -1,0 +1,100 @@
+package models;
+
+import java.util.ArrayList;
+
+public class Account {
+
+    // Variables
+    private int accountNumber;
+    private String accountHolderName;
+    private double balance;
+
+    // Transaction List
+    private ArrayList<Transaction> transactions = new ArrayList<>();
+
+    // Constructor
+    public Account(int accountNumber, String accountHolderName, double balance) {
+
+        this.accountNumber = accountNumber;
+        this.accountHolderName = accountHolderName;
+        this.balance = balance;
+    }
+
+    // Deposit Method
+    public void deposit(double amount) {
+
+        if (amount > 0) {
+
+            balance += amount;
+
+            transactions.add(new Transaction("Deposit", amount));
+
+            System.out.println("Amount Deposited Successfully!");
+
+        } else {
+
+            System.out.println("Invalid Deposit Amount!");
+        }
+    }
+
+    // Withdraw Method
+    public void withdraw(double amount) {
+
+        if (amount <= 0) {
+
+            System.out.println("Invalid Withdrawal Amount!");
+
+        } else if (amount > balance) {
+
+            System.out.println("Insufficient Balance!");
+
+        } else {
+
+            balance -= amount;
+
+            transactions.add(new Transaction("Withdrawal", amount));
+
+            System.out.println("Withdrawal Successful!");
+        }
+    }
+
+    // Display Account Details
+    public void displayAccountDetails() {
+
+        System.out.println("\n----- Account Details -----");
+
+        System.out.println("Account Number : " + accountNumber);
+        System.out.println("Account Holder : " + accountHolderName);
+        System.out.println("Balance        : " + balance);
+    }
+
+    // Show Transaction History
+    public void showTransactionHistory() {
+
+        System.out.println("\n----- Transaction History -----");
+
+        if (transactions.isEmpty()) {
+
+            System.out.println("No Transactions Found!");
+
+        } else {
+
+            for (Transaction transaction : transactions) {
+
+                transaction.displayTransaction();
+            }
+        }
+    }
+
+    // Getter for Account Number
+    public int getAccountNumber() {
+
+        return accountNumber;
+    }
+
+    // Getter for Balance
+    public double getBalance() {
+
+        return balance;
+    }
+}
