@@ -144,7 +144,15 @@ public class LoginFrame extends JFrame
             Account account =
                     bankService.findAccount(accountNumber);
 
-            new DashboardFrame(account);
+            if (account.getRole()
+                    .equalsIgnoreCase("admin")) {
+
+                new AdminDashboardFrame();
+
+            } else {
+
+                new DashboardFrame(account);
+            }
 
             dispose();
 

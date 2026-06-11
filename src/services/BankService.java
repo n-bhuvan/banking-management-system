@@ -266,5 +266,53 @@ public class BankService {
                 receiverAccountNumber,
                 receiver.getBalance());
     }
+    public ArrayList<Account> getAllAccounts() {
+
+        return accounts;
+    }
+
+    public double getTotalBankBalance() {
+
+        double total = 0;
+
+        for (Account account : accounts) {
+
+            total += account.getBalance();
+        }
+
+        return total;
+    }
+
+    public int getTotalUsers() {
+
+        int count = 0;
+
+        for (Account account : accounts) {
+
+            if (account.getRole()
+                    .equalsIgnoreCase("user")) {
+
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public int getTotalAdmins() {
+
+        int count = 0;
+
+        for (Account account : accounts) {
+
+            if (account.getRole()
+                    .equalsIgnoreCase("admin")) {
+
+                count++;
+            }
+        }
+
+        return count;
+    }
 }
 
