@@ -11,16 +11,21 @@ public class Account implements Serializable {
     private int accountNumber;
     private String accountHolderName;
     private double balance;
+    private String password;
 
     // Transaction List
     private ArrayList<Transaction> transactions = new ArrayList<>();
 
     // Constructor
-    public Account(int accountNumber, String accountHolderName, double balance) {
+    public Account(int accountNumber,
+               String accountHolderName,
+               double balance,
+               String password) {
 
         this.accountNumber = accountNumber;
         this.accountHolderName = accountHolderName;
         this.balance = balance;
+        this.password = password;
     }
 
     // Deposit Method
@@ -105,5 +110,9 @@ public class Account implements Serializable {
     public double getBalance() {
 
         return balance;
+    }
+    public String getPassword() {
+
+        return password;
     }
 }

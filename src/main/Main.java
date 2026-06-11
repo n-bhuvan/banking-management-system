@@ -19,12 +19,13 @@ public class Main {
             System.out.println("\n===== Banking System Menu =====");
 
             System.out.println("1. Create Account");
-            System.out.println("2. Deposit Money");
-            System.out.println("3. Withdraw Money");
-            System.out.println("4. Transfer Money");
-            System.out.println("5. Display Account Details");
-            System.out.println("6. Show Transaction History");
-            System.out.println("7. Exit");
+            System.out.println("2. Login");
+            System.out.println("3. Deposit Money");
+            System.out.println("4. Withdraw Money");
+            System.out.println("5. Transfer Money");
+            System.out.println("6. Display Account Details");
+            System.out.println("7. Show Transaction History");
+            System.out.println("8. Exit");
 
             System.out.print("Enter Your Choice: ");
 
@@ -35,23 +36,77 @@ public class Main {
                 // Create Account
                 case 1:
 
-                    System.out.print("Enter Account Number: ");
+                    System.out.print(
+                            "Enter Account Number: ");
+
                     int accNo = scanner.nextInt();
 
                     scanner.nextLine();
 
-                    System.out.print("Enter Account Holder Name: ");
-                    String name = scanner.nextLine();
+                    System.out.print(
+                            "Enter Account Holder Name: ");
 
-                    System.out.print("Enter Initial Balance: ");
-                    double balance = scanner.nextDouble();
+                    String name =
+                            scanner.nextLine();
 
-                    bankService.createAccount(accNo, name, balance);
+                    System.out.print(
+                            "Enter Initial Balance: ");
+
+                    double balance =
+                            scanner.nextDouble();
+
+                    scanner.nextLine();
+
+                    System.out.print(
+                            "Set Account Password: ");
+
+                    String password =
+                            scanner.nextLine();
+
+                    bankService.createAccount(
+                            accNo,
+                            name,
+                            balance,
+                            password);
+
+                    break;
+
+                case 2:
+
+                    System.out.print(
+                            "Enter Account Number: ");
+
+                    int loginAccNo =
+                            scanner.nextInt();
+
+                    scanner.nextLine();
+
+                    System.out.print(
+                            "Enter Password: ");
+
+                    String loginPassword =
+                            scanner.nextLine();
+
+                    boolean loginSuccess =
+                            bankService.login(
+                                    loginAccNo,
+                                    loginPassword);
+
+                    if (loginSuccess) {
+
+                        System.out.println(
+                                "Login Successful!");
+
+                    } else {
+
+                        System.out.println(
+                                "Invalid Credentials!");
+                    }
 
                     break;
 
                 // Deposit Money
-                case 2:
+                case 3:
 
                     System.out.print("Enter Account Number: ");
                     int depositAccNo = scanner.nextInt();
@@ -65,7 +120,7 @@ public class Main {
                     break;
 
                 // Withdraw Money
-                case 3:
+                case 4:
 
                     System.out.print("Enter Account Number: ");
                     int withdrawAccNo = scanner.nextInt();
@@ -78,7 +133,7 @@ public class Main {
 
                     break;
                 
-                case 4:
+                case 5:
 
                     System.out.print(
                             "Enter Sender Account Number: ");
@@ -105,7 +160,7 @@ public class Main {
 
                     break;
                 // Display Account
-                case 5:
+                case 6:
 
                     System.out.print("Enter Account Number: ");
                     int displayAccNo = scanner.nextInt();
@@ -115,7 +170,7 @@ public class Main {
                     break;
 
                 // Show Transactions
-                case 6:
+                case 7:
 
                     System.out.print("Enter Account Number: ");
                     int transactionAccNo = scanner.nextInt();
@@ -125,7 +180,7 @@ public class Main {
                     break;
 
                 // Exit
-                case 7:
+                case 8:
 
                     System.out.println("Thank You For Using Banking System!");
 
@@ -136,7 +191,7 @@ public class Main {
                     System.out.println("Invalid Choice!");
             }
 
-        } while (choice != 7);
+        } while (choice != 8);
 
         scanner.close();
     }

@@ -20,19 +20,46 @@ public class BankService {
 
     // Create Account
     public void createAccount(int accountNumber,
-                              String accountHolderName,
-                              double balance) {
+                          String accountHolderName,
+                          double balance,
+                          String password) {
+
+    // Check Duplicate Account
+        if (findAccount(accountNumber) != null) {
+
+            System.out.println(
+                    "Account Number Already Exists!");
+
+            return;
+        }
 
         Account newAccount =
                 new Account(accountNumber,
                             accountHolderName,
-                            balance);
+                            balance,
+                            password);
 
         accounts.add(newAccount);
 
         FileHandler.saveAccounts(accounts);
 
-        System.out.println("Account Created Successfully!");
+        System.out.println(
+                "Account Created Successfully!");
+    }
+
+    public boolean login(int accountNumber,
+                     String password) {
+
+        Account account =
+                findAccount(accountNumber);
+
+        if (account == null) {
+
+            return false;
+        }
+
+        return account.getPassword()
+                .equals(password);
     }
 
     // Find Account
