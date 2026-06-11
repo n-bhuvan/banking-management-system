@@ -88,6 +88,12 @@ public class Account implements Serializable {
             }
         }
     }
+    public void addTransaction(String type,
+                           double amount) {
+
+        transactions.add(
+                new Transaction(type, amount));
+    }
 
     // Getter for Account Number
     public int getAccountNumber() {

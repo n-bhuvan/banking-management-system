@@ -114,4 +114,78 @@ public class BankService {
             System.out.println("Account Not Found!");
         }
     }
+    public void transferMoney(int senderAccountNumber,
+                          int receiverAccountNumber,
+                          double amount) {
+
+        Account sender =
+                findAccount(senderAccountNumber);
+
+        Account receiver =
+                findAccount(receiverAccountNumber);
+
+        // Validate Accounts
+        if (sender == null) {
+
+            System.out.println("Sender Account Not Found!");
+            return;
+        }
+
+        if (receiver == null) {
+
+            System.out.println("Receiver Account Not Found!");
+            return;
+        }
+
+        // Prevent Self Transfer
+        if (senderAccountNumber ==
+                receiverAccountNumber) {
+
+            System.out.println(
+                    "Cannot Transfer To Same Account!");
+
+            return;
+        }
+
+        // Validate Amount
+        if (amount <= 0) {
+
+            System.out.println(
+                    "Invalid Transfer Amount!");
+
+            return;
+        }
+
+        // Check Balance
+        if (sender.getBalance() < amount) {
+
+            System.out.println(
+                    "Insufficient Balance!");
+
+            return;
+        }
+
+        // Transfer Logic
+        sender.withdraw(amount);
+
+        receiver.deposit(amount);
+
+        // Advanced Transaction Logs
+        sender.addTransaction(
+                "Transferred To Account "
+                        + receiverAccountNumber,
+                amount);
+
+        receiver.addTransaction(
+                "Received From Account "
+                        + senderAccountNumber,
+                amount);
+
+        // Save Accounts
+        FileHandler.saveAccounts(accounts);
+
+        System.out.println(
+                "Money Transfer Successful!");
+    }
 }
+
