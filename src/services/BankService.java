@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import utils.FileHandler;
 import models.Account;
 import services.DatabaseService;
+import security.PasswordHasher;
 
 public class BankService {
 
@@ -39,12 +40,14 @@ public class BankService {
 
             return;
         }
-
+        String hashedPassword =
+        PasswordHasher.hashPassword(
+                password);
         Account newAccount =
                 new Account(accountNumber,
                             accountHolderName,
                             balance,
-                            password,
+                            hashedPassword,
                             role);
 
         accounts.add(newAccount);
@@ -71,8 +74,11 @@ public class BankService {
             return false;
         }
 
+        String hashedPassword =
+                PasswordHasher.hashPassword(password);
+
         return account.getPassword()
-                .equals(password);
+                .equals(hashedPassword);
     }
 
     public boolean isAdmin(int accountNumber) {

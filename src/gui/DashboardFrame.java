@@ -133,6 +133,14 @@ public class DashboardFrame extends JFrame
         setVisible(true);
     }
 
+    private void refreshAccountData() {
+
+        currentAccount =
+                bankService.findAccount(
+                        currentAccount
+                                .getAccountNumber());
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -159,6 +167,7 @@ public class DashboardFrame extends JFrame
             bankService.depositMoney(
                     currentAccount.getAccountNumber(),
                     amount);
+            refreshAccountData();
 
             JOptionPane.showMessageDialog(
                     this,
@@ -179,7 +188,7 @@ public class DashboardFrame extends JFrame
             bankService.withdrawMoney(
                     currentAccount.getAccountNumber(),
                     amount);
-
+            refreshAccountData();
             JOptionPane.showMessageDialog(
                     this,
                     "Withdrawal Successful!");
@@ -208,6 +217,7 @@ public class DashboardFrame extends JFrame
                     currentAccount.getAccountNumber(),
                     receiverAccount,
                     amount);
+            refreshAccountData();
 
             JOptionPane.showMessageDialog(
                     this,

@@ -22,6 +22,8 @@ public class LoginFrame extends JFrame
 
     JButton loginButton;
 
+    JButton registerButton;
+
     BankService bankService;
 
     public LoginFrame() {
@@ -31,96 +33,122 @@ public class LoginFrame extends JFrame
         // Frame
         setTitle("Smart Banking System");
 
-        setSize(400, 300);
-
-        setLayout(null);
+        setSize(500, 400);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setLocationRelativeTo(null);
 
-        // Title
-        titleLabel =
-                new JLabel("Bank Login");
+        // Main Panel
+        JPanel panel = new JPanel();
 
-        titleLabel.setFont(
+        panel.setLayout(new GridLayout(7, 1, 10, 10));
+
+        panel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        30,
+                        50,
+                        30,
+                        50));
+
+        // Title
+        JLabel title =
+                new JLabel(
+                        "Smart Banking Login",
+                        SwingConstants.CENTER);
+
+        title.setFont(
                 new Font("Arial",
                         Font.BOLD,
-                        22));
+                        24));
 
-        titleLabel.setBounds(
-                130,
-                20,
-                200,
-                30);
-
-        add(titleLabel);
+        panel.add(title);
 
         // Account Number
-        accountLabel =
-                new JLabel("Account Number:");
+        accountField = new JTextField();
 
-        accountLabel.setBounds(
-                50,
-                80,
-                120,
-                25);
-
-        add(accountLabel);
-
-        accountField =
-                new JTextField();
-
-        accountField.setBounds(
-                180,
-                80,
-                150,
-                25);
-
-        add(accountField);
+        panel.add(
+                createFieldPanel(
+                        "Account Number",
+                        accountField));
 
         // Password
-        passwordLabel =
-                new JLabel("Password:");
+        passwordField = new JPasswordField();
 
-        passwordLabel.setBounds(
-                50,
-                130,
-                120,
-                25);
-
-        add(passwordLabel);
-
-        passwordField =
-                new JPasswordField();
-
-        passwordField.setBounds(
-                180,
-                130,
-                150,
-                25);
-
-        add(passwordField);
+        panel.add(
+                createFieldPanel(
+                        "Password",
+                        passwordField));
 
         // Login Button
         loginButton =
                 new JButton("Login");
 
-        loginButton.setBounds(
-                140,
-                190,
-                100,
-                30);
+        loginButton.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        16));
 
         loginButton.addActionListener(this);
 
-        add(loginButton);
+        panel.add(loginButton);
+
+        // Register Button
+        registerButton =
+                new JButton("Register");
+
+        registerButton.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        16));
+
+        registerButton.addActionListener(this);
+
+        panel.add(registerButton);
+
+        add(panel);
 
         setVisible(true);
     }
+    
+    private JPanel createFieldPanel(
+        String labelText,
+        JTextField field) {
+
+        JPanel panel =
+                new JPanel(
+                        new BorderLayout(10, 10));
+
+        JLabel label =
+                new JLabel(labelText);
+
+        label.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        14));
+
+        field.setFont(
+                new Font("Arial",
+                        Font.PLAIN,
+                        14));
+
+        panel.add(label, BorderLayout.WEST);
+
+        panel.add(field, BorderLayout.CENTER);
+
+        return panel;
+    }
 
     @Override
+    
     public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == registerButton) {
+
+            new RegisterFrame();
+
+            return;
+        }
 
         int accountNumber =
                 Integer.parseInt(
