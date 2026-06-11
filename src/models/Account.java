@@ -122,4 +122,7 @@ public class Account implements Serializable {
 
         return role;
     }
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
 }

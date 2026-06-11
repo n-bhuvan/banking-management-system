@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import models.Account;
 import utils.FileHandler;
+import services.DatabaseService;
 
 public class BankService {
 
@@ -42,6 +43,11 @@ public class BankService {
                             role);
 
         accounts.add(newAccount);
+
+        DatabaseService databaseService =
+                new DatabaseService();
+
+        databaseService.saveAccount(newAccount);
 
         FileHandler.saveAccounts(accounts);
 
