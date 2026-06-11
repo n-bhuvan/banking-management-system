@@ -25,7 +25,8 @@ public class Main {
             System.out.println("5. Transfer Money");
             System.out.println("6. Display Account Details");
             System.out.println("7. Show Transaction History");
-            System.out.println("8. Exit");
+            System.out.println("8. Check Admin Access");
+            System.out.println("9. Exit");
 
             System.out.print("Enter Your Choice: ");
 
@@ -63,11 +64,18 @@ public class Main {
                     String password =
                             scanner.nextLine();
 
+                    System.out.print(
+                            "Enter Role (Customer/Admin): ");
+
+                    String role =
+                            scanner.nextLine();
+
                     bankService.createAccount(
                             accNo,
                             name,
                             balance,
-                            password);
+                            password,
+                            role);
 
                     break;
 
@@ -179,8 +187,32 @@ public class Main {
 
                     break;
 
-                // Exit
                 case 8:
+
+                    System.out.print(
+                            "Enter Account Number: ");
+
+                    int adminAccNo =
+                            scanner.nextInt();
+
+                    boolean isAdmin =
+                            bankService.isAdmin(adminAccNo);
+
+                    if (isAdmin) {
+
+                        System.out.println(
+                                "Admin Access Granted!");
+
+                    } else {
+
+                        System.out.println(
+                                "User Access Only!");
+                    }
+
+                    break;
+
+                // Exit
+                case 9:
 
                     System.out.println("Thank You For Using Banking System!");
 
@@ -191,7 +223,7 @@ public class Main {
                     System.out.println("Invalid Choice!");
             }
 
-        } while (choice != 8);
+        } while (choice != 9);
 
         scanner.close();
     }

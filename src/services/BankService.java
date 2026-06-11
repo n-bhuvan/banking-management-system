@@ -22,9 +22,10 @@ public class BankService {
     public void createAccount(int accountNumber,
                           String accountHolderName,
                           double balance,
-                          String password) {
+                          String password,
+                          String role) {
 
-    // Check Duplicate Account
+    // Duplicate Check
         if (findAccount(accountNumber) != null) {
 
             System.out.println(
@@ -37,7 +38,8 @@ public class BankService {
                 new Account(accountNumber,
                             accountHolderName,
                             balance,
-                            password);
+                            password,
+                            role);
 
         accounts.add(newAccount);
 
@@ -48,7 +50,7 @@ public class BankService {
     }
 
     public boolean login(int accountNumber,
-                     String password) {
+                        String password) {
 
         Account account =
                 findAccount(accountNumber);
@@ -60,6 +62,20 @@ public class BankService {
 
         return account.getPassword()
                 .equals(password);
+    }
+
+    public boolean isAdmin(int accountNumber) {
+
+        Account account =
+                findAccount(accountNumber);
+
+        if (account == null) {
+
+            return false;
+        }
+
+        return account.getRole()
+                .equalsIgnoreCase("admin");
     }
 
     // Find Account
