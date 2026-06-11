@@ -3,11 +3,20 @@ package services;
 import java.util.ArrayList;
 
 import models.Account;
+import utils.FileHandler;
 
 public class BankService {
 
-    // Store Accounts
-    private ArrayList<Account> accounts = new ArrayList<>();
+    // Load Saved Accounts
+    private ArrayList<Account> accounts;
+
+    // Constructor
+    public BankService() {
+
+        accounts = FileHandler.loadAccounts();
+
+        System.out.println("Loaded Accounts: " + accounts.size());
+    }
 
     // Create Account
     public void createAccount(int accountNumber,
@@ -20,6 +29,8 @@ public class BankService {
                             balance);
 
         accounts.add(newAccount);
+
+        FileHandler.saveAccounts(accounts);
 
         System.out.println("Account Created Successfully!");
     }
@@ -48,6 +59,8 @@ public class BankService {
 
             account.deposit(amount);
 
+            FileHandler.saveAccounts(accounts);
+
         } else {
 
             System.out.println("Account Not Found!");
@@ -63,6 +76,8 @@ public class BankService {
         if (account != null) {
 
             account.withdraw(amount);
+
+            FileHandler.saveAccounts(accounts);
 
         } else {
 
@@ -85,7 +100,7 @@ public class BankService {
         }
     }
 
-    // Show Transaction History
+    // Show Transactions
     public void showTransactions(int accountNumber) {
 
         Account account = findAccount(accountNumber);
