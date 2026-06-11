@@ -2,8 +2,8 @@ package services;
 
 import java.util.ArrayList;
 
-import models.Account;
 import utils.FileHandler;
+import models.Account;
 import services.DatabaseService;
 
 public class BankService {
@@ -14,9 +14,14 @@ public class BankService {
     // Constructor
     public BankService() {
 
-        accounts = FileHandler.loadAccounts();
+        DatabaseService databaseService =
+                new DatabaseService();
 
-        System.out.println("Loaded Accounts: " + accounts.size());
+        accounts =
+                databaseService.loadAccounts();
+
+        System.out.println(
+                "Accounts Loaded From Database!");
     }
 
     // Create Account
@@ -100,37 +105,51 @@ public class BankService {
 
     // Deposit Money
     public void depositMoney(int accountNumber,
-                             double amount) {
+                         double amount) {
 
-        Account account = findAccount(accountNumber);
+        Account account =
+                findAccount(accountNumber);
 
         if (account != null) {
 
             account.deposit(amount);
 
-            FileHandler.saveAccounts(accounts);
+            DatabaseService databaseService =
+                    new DatabaseService();
+
+            databaseService.updateBalance(
+                    accountNumber,
+                    account.getBalance());
 
         } else {
 
-            System.out.println("Account Not Found!");
+            System.out.println(
+                    "Account Not Found!");
         }
     }
 
     // Withdraw Money
     public void withdrawMoney(int accountNumber,
-                              double amount) {
+                          double amount) {
 
-        Account account = findAccount(accountNumber);
+        Account account =
+                findAccount(accountNumber);
 
         if (account != null) {
 
             account.withdraw(amount);
 
-            FileHandler.saveAccounts(accounts);
+            DatabaseService databaseService =
+                    new DatabaseService();
+
+            databaseService.updateBalance(
+                    accountNumber,
+                    account.getBalance());
 
         } else {
 
-            System.out.println("Account Not Found!");
+            System.out.println(
+                    "Account Not Found!");
         }
     }
 
@@ -235,6 +254,17 @@ public class BankService {
 
         System.out.println(
                 "Money Transfer Successful!");
+
+        DatabaseService databaseService =
+        new DatabaseService();
+
+        databaseService.updateBalance(
+                senderAccountNumber,
+                sender.getBalance());
+
+        databaseService.updateBalance(
+                receiverAccountNumber,
+                receiver.getBalance());
     }
 }
 
