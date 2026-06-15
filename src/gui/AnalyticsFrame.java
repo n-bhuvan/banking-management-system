@@ -2,132 +2,307 @@ package gui;
 
 import javax.swing.*;
 
-import services.BankService;
-
 import java.awt.*;
+import java.sql.*;
 
-public class AnalyticsFrame extends JFrame {
+import utils.DatabaseConnection;
 
-    private JLabel totalAccountsLabel;
-    private JLabel totalBalanceLabel;
-    private JLabel totalUsersLabel;
-    private JLabel totalAdminsLabel;
+public class AnalyticsFrame
+        extends JFrame {
 
-    private BankService bankService;
+    // Colors
+    private final Color BACKGROUND_COLOR =
+            new Color(24, 26, 27);
+
+    private final Color CARD_COLOR =
+            new Color(40, 44, 52);
+
+    private final Color TEXT_COLOR =
+            Color.WHITE;
+
+    private final Color ACCENT_COLOR =
+            new Color(0, 120, 215);
 
     public AnalyticsFrame() {
 
-        bankService = new BankService();
+        setTitle("Bank Analytics");
 
-        // Frame
-        setTitle("Bank Analytics Dashboard");
-
-        setSize(500, 350);
-
-        setLayout(null);
-
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(900, 500);
 
         setLocationRelativeTo(null);
 
+        setDefaultCloseOperation(
+                JFrame.DISPOSE_ON_CLOSE);
+
+        getContentPane().setBackground(
+                BACKGROUND_COLOR);
+
+        setLayout(new BorderLayout());
+
         // Title
         JLabel title =
-                new JLabel("Bank Analytics");
+                new JLabel(
+                        "Bank Analytics Dashboard",
+                        SwingConstants.CENTER);
 
         title.setFont(
                 new Font("Arial",
                         Font.BOLD,
-                        24));
+                        32));
 
-        title.setBounds(
-                140,
-                20,
-                250,
-                30);
+        title.setForeground(
+                TEXT_COLOR);
 
-        add(title);
+        title.setBorder(
+                BorderFactory.createEmptyBorder(
+                        25,
+                        0,
+                        25,
+                        0));
 
-        // Total Accounts
-        totalAccountsLabel =
-                new JLabel(
-                        "Total Accounts: "
-                                + bankService
-                                .getAllAccounts()
-                                .size());
+        add(title, BorderLayout.NORTH);
 
-        totalAccountsLabel.setBounds(
-                80,
-                90,
-                300,
-                30);
+        // Main Panel
+        JPanel mainPanel =
+                new JPanel();
 
-        totalAccountsLabel.setFont(
-                new Font("Arial",
-                        Font.PLAIN,
-                        18));
+        mainPanel.setBackground(
+                BACKGROUND_COLOR);
 
-        add(totalAccountsLabel);
+        mainPanel.setLayout(
+                new GridLayout(2,2,25,25));
 
-        // Total Balance
-        totalBalanceLabel =
-                new JLabel(
-                        "Total Bank Balance: "
-                                + bankService
-                                .getTotalBankBalance());
+        mainPanel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        20,
+                        20,
+                        20,
+                        20));
 
-        totalBalanceLabel.setBounds(
-                80,
-                140,
-                350,
-                30);
+        // Analytics Data
+        int totalAccounts =
+                getTotalAccounts();
 
-        totalBalanceLabel.setFont(
-                new Font("Arial",
-                        Font.PLAIN,
-                        18));
+        int totalUsers =
+                getTotalUsers();
 
-        add(totalBalanceLabel);
+        int totalAdmins =
+                getTotalAdmins();
 
-        // Total Users
-        totalUsersLabel =
-                new JLabel(
-                        "Total Users: "
-                                + bankService
-                                .getTotalUsers());
+        double totalBalance =
+                getTotalBalance();
 
-        totalUsersLabel.setBounds(
-                80,
-                190,
-                300,
-                30);
+        // Cards
+        mainPanel.add(
+                createCard(
+                        "Total Accounts",
+                        String.valueOf(
+                                totalAccounts)));
 
-        totalUsersLabel.setFont(
-                new Font("Arial",
-                        Font.PLAIN,
-                        18));
+        mainPanel.add(
+                createCard(
+                        "Total Users",
+                        String.valueOf(
+                                totalUsers)));
 
-        add(totalUsersLabel);
+        mainPanel.add(
+                createCard(
+                        "Total Admins",
+                        String.valueOf(
+                                totalAdmins)));
 
-        // Total Admins
-        totalAdminsLabel =
-                new JLabel(
-                        "Total Admins: "
-                                + bankService
-                                .getTotalAdmins());
+        mainPanel.add(
+                createCard(
+                        "Total Balance",
+                        "₹" + totalBalance));
 
-        totalAdminsLabel.setBounds(
-                80,
-                240,
-                300,
-                30);
-
-        totalAdminsLabel.setFont(
-                new Font("Arial",
-                        Font.PLAIN,
-                        18));
-
-        add(totalAdminsLabel);
+        add(mainPanel, BorderLayout.CENTER);
 
         setVisible(true);
+    }
+
+    // Create Analytics Card
+    private JPanel createCard(
+            String title,
+            String value) {
+
+        JPanel card =
+                new JPanel();
+
+        card.setBackground(
+                CARD_COLOR);
+
+        card.setLayout(
+                new BorderLayout());
+
+        card.setBorder(
+                BorderFactory.createCompoundBorder(
+
+                        BorderFactory.createLineBorder(
+                                ACCENT_COLOR,
+                                2),
+
+                        BorderFactory.createEmptyBorder(
+                                20,
+                                20,
+                                20,
+                                20)));
+
+        JLabel titleLabel =
+                new JLabel(
+                        title,
+                        SwingConstants.CENTER);
+
+        titleLabel.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        22));
+
+        titleLabel.setForeground(
+                TEXT_COLOR);
+
+        JLabel valueLabel =
+                new JLabel(
+                        value,
+                        SwingConstants.CENTER);
+
+        valueLabel.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        36));
+
+        valueLabel.setForeground(
+                Color.WHITE);
+
+        card.add(
+                titleLabel,
+                BorderLayout.NORTH);
+
+        card.add(
+                valueLabel,
+                BorderLayout.CENTER);
+
+        return card;
+    }
+
+    // Total Accounts
+    private int getTotalAccounts() {
+
+        String query =
+                "SELECT COUNT(*) FROM accounts";
+
+        try {
+
+            Connection connection =
+                    DatabaseConnection.getConnection();
+
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+
+            ResultSet resultSet =
+                    statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                return resultSet.getInt(1);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // Total Users
+    private int getTotalUsers() {
+
+        String query =
+                "SELECT COUNT(*) FROM accounts "
+                + "WHERE role = 'user'";
+
+        try {
+
+            Connection connection =
+                    DatabaseConnection.getConnection();
+
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+
+            ResultSet resultSet =
+                    statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                return resultSet.getInt(1);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // Total Admins
+    private int getTotalAdmins() {
+
+        String query =
+                "SELECT COUNT(*) FROM admins";
+
+        try {
+
+            Connection connection =
+                    DatabaseConnection.getConnection();
+
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+
+            ResultSet resultSet =
+                    statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                return resultSet.getInt(1);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // Total Balance
+    private double getTotalBalance() {
+
+        String query =
+                "SELECT SUM(balance) FROM accounts";
+
+        try {
+
+            Connection connection =
+                    DatabaseConnection.getConnection();
+
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+
+            ResultSet resultSet =
+                    statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                return resultSet.getDouble(1);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 }

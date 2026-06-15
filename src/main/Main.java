@@ -71,7 +71,6 @@ public class Main {
                             scanner.nextLine();
 
                     bankService.createAccount(
-                            accNo,
                             name,
                             balance,
                             password,
@@ -81,24 +80,24 @@ public class Main {
 
                 case 2:
 
-                    System.out.print(
-                            "Enter Account Number: ");
 
-                    int loginAccNo =
-                            scanner.nextInt();
+                System.out.print(
+                                "Enter Account Number: ");
 
-                    scanner.nextLine();
+                        long loginAccNo =
+                                Long.parseLong(
+                                        scanner.nextLine());
 
-                    System.out.print(
-                            "Enter Password: ");
+                        System.out.print(
+                                "Enter Password: ");
 
-                    String loginPassword =
-                            scanner.nextLine();
+                        String loginPassword =
+                                scanner.nextLine();
 
-                    boolean loginSuccess =
-                            bankService.login(
-                                    loginAccNo,
-                                    loginPassword);
+                        boolean loginSuccess =
+                                bankService.login(
+                                        loginAccNo,
+                                        loginPassword);
 
                     if (loginSuccess) {
 
@@ -178,16 +177,8 @@ public class Main {
                     break;
 
                 // Show Transactions
+
                 case 7:
-
-                    System.out.print("Enter Account Number: ");
-                    int transactionAccNo = scanner.nextInt();
-
-                    bankService.showTransactions(transactionAccNo);
-
-                    break;
-
-                case 8:
 
                     System.out.print(
                             "Enter Account Number: ");
@@ -212,7 +203,7 @@ public class Main {
                     break;
 
                 // Exit
-                case 9:
+                case 8:
 
                     System.out.println("Thank You For Using Banking System!");
 
@@ -223,7 +214,7 @@ public class Main {
                     System.out.println("Invalid Choice!");
             }
 
-        } while (choice != 9);
+        } while (choice != 8);
 
         scanner.close();
     }

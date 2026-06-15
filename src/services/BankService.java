@@ -10,7 +10,6 @@ import security.PasswordHasher;
 public class BankService {
 
     // Load Saved Accounts
-    private ArrayList<Account> accounts;
 
     // Constructor
     public BankService() {
@@ -18,52 +17,46 @@ public class BankService {
         DatabaseService databaseService =
                 new DatabaseService();
 
-        accounts =
-                databaseService.loadAccounts();
 
         System.out.println(
                 "Accounts Loaded From Database!");
     }
 
     // Create Account
-    public void createAccount(int accountNumber,
-                          String accountHolderName,
-                          double balance,
-                          String password,
-                          String role) {
+    public long createAccount(
+        String accountHolderName,
+        double balance,
+        String password,String role) {
 
-    // Duplicate Check
-        if (findAccount(accountNumber) != null) {
+    // Generate Account Number
+        long generatedAccountNumber =
+                20260000L
+                + (long)(Math.random() * 9000);
 
-            System.out.println(
-                    "Account Number Already Exists!");
-
-            return;
-        }
+        // Hash Password
         String hashedPassword =
-        PasswordHasher.hashPassword(
-                password);
-        Account newAccount =
-                new Account(accountNumber,
-                            accountHolderName,
-                            balance,
-                            hashedPassword,
-                            role);
+                PasswordHasher.hashPassword(
+                        password);
 
-        accounts.add(newAccount);
+        // Create Account Object
+        Account newAccount =
+                new Account(
+                        generatedAccountNumber,
+                        accountHolderName,
+                        balance,
+                        hashedPassword,
+                        "user");
 
         DatabaseService databaseService =
                 new DatabaseService();
 
-        databaseService.saveAccount(newAccount);
+        databaseService.saveAccount(
+                newAccount);
 
-        FileHandler.saveAccounts(accounts);
-
-        System.out.println(
-                "Account Created Successfully!");
+        return generatedAccountNumber;
     }
 
-    public boolean login(int accountNumber,
+    public boolean login(long accountNumber,
                         String password) {
 
         Account account =
@@ -81,7 +74,7 @@ public class BankService {
                 .equals(hashedPassword);
     }
 
-    public boolean isAdmin(int accountNumber) {
+    public boolean isAdmin(long accountNumber) {
 
         Account account =
                 findAccount(accountNumber);
@@ -96,71 +89,105 @@ public class BankService {
     }
 
     // Find Account
-    public Account findAccount(int accountNumber) {
+    public Account findAccount(
+            long accountNumber) {
 
-        for (Account account : accounts) {
+        DatabaseService databaseService =
+                new DatabaseService();
 
-            if (account.getAccountNumber() == accountNumber) {
+        return databaseService
+                .getAccountFromDatabase(
+                        accountNumber);
+    }
+    public Account getUpdatedAccount(
+            long accountNumber) {
 
-                return account;
-            }
-        }
+        DatabaseService databaseService =
+                new DatabaseService();
 
-        return null;
+        return databaseService
+                .getAccountFromDatabase(
+                        accountNumber);
     }
 
     // Deposit Money
-    public void depositMoney(int accountNumber,
-                         double amount) {
+    public boolean depositMoney(
+            long accountNumber,
+            double amount) {
+
+        DatabaseService databaseService =
+                new DatabaseService();
 
         Account account =
-                findAccount(accountNumber);
+                databaseService
+                        .getAccountFromDatabase(
+                                accountNumber);
 
         if (account != null) {
 
-            account.deposit(amount);
-
-            DatabaseService databaseService =
-                    new DatabaseService();
+            double newBalance =
+                    account.getBalance()
+                    + amount;
 
             databaseService.updateBalance(
                     accountNumber,
-                    account.getBalance());
+                    newBalance);
 
-        } else {
+            databaseService.saveTransaction(
+                    accountNumber,
+                    "Deposit",
+                    amount,
+                    java.time.LocalDateTime
+                            .now()
+                            .toString());
 
-            System.out.println(
-                    "Account Not Found!");
+            return true;
         }
+
+        return false;
     }
-
     // Withdraw Money
-    public void withdrawMoney(int accountNumber,
-                          double amount) {
+    public boolean withdrawMoney(
+            long accountNumber,
+            double amount) {
+
+        DatabaseService databaseService =
+                new DatabaseService();
 
         Account account =
-                findAccount(accountNumber);
+                databaseService
+                        .getAccountFromDatabase(
+                                accountNumber);
 
         if (account != null) {
 
-            account.withdraw(amount);
+            if (amount <= account.getBalance()) {
 
-            DatabaseService databaseService =
-                    new DatabaseService();
+                double newBalance =
+                        account.getBalance()
+                        - amount;
 
-            databaseService.updateBalance(
-                    accountNumber,
-                    account.getBalance());
+                databaseService.updateBalance(
+                        accountNumber,
+                        newBalance);
 
-        } else {
+                databaseService.saveTransaction(
+                        accountNumber,
+                        "Withdraw",
+                        amount,
+                        java.time.LocalDateTime
+                                .now()
+                                .toString());
 
-            System.out.println(
-                    "Account Not Found!");
+                return true;
+            }
         }
+
+        return false;
     }
 
     // Display Account
-    public void displayAccount(int accountNumber) {
+    public void displayAccount(long accountNumber) {
 
         Account account = findAccount(accountNumber);
 
@@ -175,116 +202,71 @@ public class BankService {
     }
 
     // Show Transactions
-    public void showTransactions(int accountNumber) {
-
-        Account account = findAccount(accountNumber);
-
-        if (account != null) {
-
-            account.showTransactionHistory();
-
-        } else {
-
-            System.out.println("Account Not Found!");
-        }
-    }
-    public void transferMoney(int senderAccountNumber,
-                          int receiverAccountNumber,
-                          double amount) {
-
-        Account sender =
-                findAccount(senderAccountNumber);
-
-        Account receiver =
-                findAccount(receiverAccountNumber);
-
-        // Validate Accounts
-        if (sender == null) {
-
-            System.out.println("Sender Account Not Found!");
-            return;
-        }
-
-        if (receiver == null) {
-
-            System.out.println("Receiver Account Not Found!");
-            return;
-        }
-
-        // Prevent Self Transfer
-        if (senderAccountNumber ==
-                receiverAccountNumber) {
-
-            System.out.println(
-                    "Cannot Transfer To Same Account!");
-
-            return;
-        }
-
-        // Validate Amount
-        if (amount <= 0) {
-
-            System.out.println(
-                    "Invalid Transfer Amount!");
-
-            return;
-        }
-
-        // Check Balance
-        if (sender.getBalance() < amount) {
-
-            System.out.println(
-                    "Insufficient Balance!");
-
-            return;
-        }
-
-        // Transfer Logic
-        sender.withdraw(amount);
-
-        receiver.deposit(amount);
-
-        // Advanced Transaction Logs
-        sender.addTransaction(
-                "Transferred To Account "
-                        + receiverAccountNumber,
-                amount);
-
-        receiver.addTransaction(
-                "Received From Account "
-                        + senderAccountNumber,
-                amount);
-
-        // Save Accounts
-        FileHandler.saveAccounts(accounts);
-
-        System.out.println(
-                "Money Transfer Successful!");
+    public boolean transferMoney(
+            long senderAccountNumber,
+            long receiverAccountNumber,
+            double amount) {
 
         DatabaseService databaseService =
-        new DatabaseService();
+                new DatabaseService();
 
-        databaseService.updateBalance(
-                senderAccountNumber,
-                sender.getBalance());
+        Account sender =
+                databaseService
+                        .getAccountFromDatabase(
+                                senderAccountNumber);
 
-        databaseService.updateBalance(
-                receiverAccountNumber,
-                receiver.getBalance());
-    }
-    public ArrayList<Account> getAllAccounts() {
+        Account receiver =
+                databaseService
+                        .getAccountFromDatabase(
+                                receiverAccountNumber);
 
-        return accounts;
+        if (sender != null
+                && receiver != null) {
+
+            if (amount <= sender.getBalance()) {
+
+                double senderBalance =
+                        sender.getBalance()
+                        - amount;
+
+                double receiverBalance =
+                        receiver.getBalance()
+                        + amount;
+
+                databaseService.updateBalance(
+                        senderAccountNumber,
+                        senderBalance);
+
+                databaseService.updateBalance(
+                        receiverAccountNumber,
+                        receiverBalance);
+
+                databaseService.saveTransaction(
+                        senderAccountNumber,
+                        "Transfer Sent",
+                        amount,
+                        java.time.LocalDateTime
+                                .now()
+                                .toString());
+
+                databaseService.saveTransaction(
+                        receiverAccountNumber,
+                        "Transfer Received",
+                        amount,
+                        java.time.LocalDateTime
+                                .now()
+                                .toString());
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public double getTotalBankBalance() {
 
         double total = 0;
-
-        for (Account account : accounts) {
-
-            total += account.getBalance();
-        }
 
         return total;
     }
@@ -293,14 +275,6 @@ public class BankService {
 
         int count = 0;
 
-        for (Account account : accounts) {
-
-            if (account.getRole()
-                    .equalsIgnoreCase("user")) {
-
-                count++;
-            }
-        }
 
         return count;
     }
@@ -309,14 +283,6 @@ public class BankService {
 
         int count = 0;
 
-        for (Account account : accounts) {
-
-            if (account.getRole()
-                    .equalsIgnoreCase("admin")) {
-
-                count++;
-            }
-        }
 
         return count;
     }

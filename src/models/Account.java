@@ -3,22 +3,24 @@ package models;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import models.Transaction;
 
 public class Account implements Serializable {
 
 
     // Variables
-    private int accountNumber;
+    private long accountNumber;
     private String accountHolderName;
     private double balance;
     private String password;
     private String role;
 
     // Transaction List
-    private ArrayList<Transaction> transactions = new ArrayList<>();
+    private ArrayList<Transaction> transactionHistory = new ArrayList<>();
+    
 
     // Constructor
-    public Account(int accountNumber,
+    public Account(long accountNumber,
                String accountHolderName,
                double balance,
                String password,
@@ -29,6 +31,7 @@ public class Account implements Serializable {
         this.balance = balance;
         this.password = password;
         this.role = role;
+        this.transactionHistory = new ArrayList<>();
     }
 
     // Deposit Method
@@ -38,7 +41,7 @@ public class Account implements Serializable {
 
             balance += amount;
 
-            transactions.add(new Transaction("Deposit", amount));
+            transactionHistory.add(new Transaction("Deposit", amount, java.time.LocalDate.now().toString()));
 
             System.out.println("Amount Deposited Successfully!");
 
@@ -63,7 +66,7 @@ public class Account implements Serializable {
 
             balance -= amount;
 
-            transactions.add(new Transaction("Withdrawal", amount));
+            transactionHistory.add(new Transaction("Withdrawal", amount, java.time.LocalDate.now().toString()));
 
             System.out.println("Withdrawal Successful!");
         }
@@ -84,28 +87,34 @@ public class Account implements Serializable {
 
         System.out.println("\n----- Transaction History -----");
 
-        if (transactions.isEmpty()) {
+        if (transactionHistory.isEmpty()) {
 
             System.out.println("No Transactions Found!");
 
         } else {
 
-            for (Transaction transaction : transactions) {
+            for (Transaction transaction : transactionHistory) {
 
-                transaction.displayTransaction();
+                System.out.println(transaction);
             }
         }
     }
     public void addTransaction(String type,
                            double amount) {
 
-        transactions.add(
-                new Transaction(type, amount));
+        transactionHistory.add(
+                new Transaction(type, amount, java.time.LocalDate.now().toString()));
+    }
+    public void setTransactionHistory(
+            ArrayList<Transaction>
+                    transactionHistory) {
+
+        this.transactionHistory =
+                transactionHistory;
     }
 
     // Getter for Account Number
-    public int getAccountNumber() {
-
+    public long getAccountNumber() {
         return accountNumber;
     }
 
@@ -125,4 +134,11 @@ public class Account implements Serializable {
     public String getAccountHolderName() {
         return accountHolderName;
     }
+    public ArrayList<Transaction>
+        getTransactionHistory() {
+
+            return transactionHistory;
+    }
+    
+
 }

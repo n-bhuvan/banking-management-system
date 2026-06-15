@@ -2,26 +2,22 @@ package gui;
 
 import javax.swing.*;
 
-import services.BankService;
+import services.AdminService;
 
 import java.awt.*;
 import java.awt.event.*;
 
-public class LoginFrame
+public class AdminLoginFrame
         extends JFrame
         implements ActionListener {
 
-    private JTextField accountField;
+    private JTextField usernameField;
 
     private JPasswordField passwordField;
 
     private JButton loginButton;
 
-    private JButton registerButton;
-
-    private JButton adminLoginButton;
-
-    private BankService bankService;
+    private AdminService adminService;
 
     // Colors
     private final Color BACKGROUND_COLOR =
@@ -31,25 +27,25 @@ public class LoginFrame
             new Color(40,44,52);
 
     private final Color BUTTON_COLOR =
-            new Color(0,120,215);
+            new Color(220,53,69);
 
     private final Color TEXT_COLOR =
             Color.WHITE;
 
-    public LoginFrame() {
+    public AdminLoginFrame() {
 
-        bankService =
-                new BankService();
+        adminService =
+                new AdminService();
 
         // Frame
-        setTitle("Bank Login");
+        setTitle("Admin Login");
 
-        setSize(500, 620);
+        setSize(500, 500);
 
         setLocationRelativeTo(null);
 
         setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE);
+                JFrame.DISPOSE_ON_CLOSE);
 
         getContentPane().setBackground(
                 BACKGROUND_COLOR);
@@ -61,7 +57,7 @@ public class LoginFrame
                 new JPanel();
 
         card.setPreferredSize(
-                new Dimension(380,480));
+                new Dimension(380,380));
 
         card.setBackground(CARD_COLOR);
 
@@ -82,10 +78,10 @@ public class LoginFrame
 
         // Title
         JLabel title =
-                new JLabel("Bank Login");
+                new JLabel("Admin Login");
 
         title.setBounds(
-                110,
+                95,
                 20,
                 250,
                 40);
@@ -100,39 +96,39 @@ public class LoginFrame
 
         card.add(title);
 
-        // Account Label
-        JLabel accountLabel =
-                new JLabel("Account Number");
+        // Username Label
+        JLabel usernameLabel =
+                new JLabel("Username");
 
-        accountLabel.setBounds(
+        usernameLabel.setBounds(
                 40,
-                90,
+                100,
                 200,
                 25);
 
-        accountLabel.setForeground(
+        usernameLabel.setForeground(
                 TEXT_COLOR);
 
-        accountLabel.setFont(
+        usernameLabel.setFont(
                 new Font("Arial",
                         Font.BOLD,
                         16));
 
-        card.add(accountLabel);
+        card.add(usernameLabel);
 
-        // Account Field
-        accountField =
+        // Username Field
+        usernameField =
                 new JTextField();
 
-        accountField.setBounds(
+        usernameField.setBounds(
                 40,
-                120,
+                130,
                 280,
                 40);
 
-        styleTextField(accountField);
+        styleTextField(usernameField);
 
-        card.add(accountField);
+        card.add(usernameField);
 
         // Password Label
         JLabel passwordLabel =
@@ -140,7 +136,7 @@ public class LoginFrame
 
         passwordLabel.setBounds(
                 40,
-                180,
+                200,
                 200,
                 25);
 
@@ -160,7 +156,7 @@ public class LoginFrame
 
         passwordField.setBounds(
                 40,
-                210,
+                230,
                 280,
                 40);
 
@@ -171,55 +167,20 @@ public class LoginFrame
         // Login Button
         loginButton =
                 createStyledButton(
-                        "Login");
-
-        loginButton.setBounds(
-                100,
-                280,
-                160,
-                40);
-
-        card.add(loginButton);
-
-        // Register Button
-        registerButton =
-                createStyledButton(
-                        "Register");
-
-        registerButton.setBounds(
-                100,
-                330,
-                160,
-                40);
-
-        card.add(registerButton);
-
-        // Admin Button
-        adminLoginButton =
-                createStyledButton(
                         "Admin Login");
 
-        adminLoginButton.setBounds(
-                100,
-                380,
-                160,
-                40);
+        loginButton.setBounds(
+                95,
+                310,
+                180,
+                45);
 
-        card.add(adminLoginButton);
+        card.add(loginButton);
 
         add(card);
 
         setVisible(true);
     }
-    public LoginFrame(
-                long generatedAccountNumber) {
-
-        this();
-
-        accountField.setText(
-                String.valueOf(
-                        generatedAccountNumber));
-        }
 
     // Style TextFields
     private void styleTextField(
@@ -280,7 +241,7 @@ public class LoginFrame
                             MouseEvent e) {
 
                         button.setBackground(
-                                new Color(0,150,255));
+                                new Color(255,80,80));
                     }
 
                     @Override
@@ -301,61 +262,30 @@ public class LoginFrame
     public void actionPerformed(
             ActionEvent e) {
 
-        // Register
-        if (e.getSource()
-                == registerButton) {
+        String username =
+                usernameField.getText();
 
-            new RegisterFrame();
+        String password =
+                String.valueOf(
+                        passwordField
+                                .getPassword());
 
-            return;
-        }
+        boolean success =
+                adminService.login(
+                        username,
+                        password);
 
-        // Admin Login
-        if (e.getSource()
-                == adminLoginButton) {
+        if (success) {
 
-            new AdminLoginFrame();
+            new AdminDashboardFrame();
 
-            return;
-        }
+            dispose();
 
-        // User Login
-        try {
-
-            long accountNumber =
-                    Long.parseLong(
-                            accountField.getText());
-
-            String password =
-                    String.valueOf(
-                            passwordField
-                                    .getPassword());
-
-            boolean success =
-                    bankService.login(
-                            accountNumber,
-                            password);
-
-            if (success) {
-
-                new DashboardFrame(
-                        bankService.findAccount(
-                                accountNumber));
-
-                dispose();
-
-            } else {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid Credentials!");
-            }
-
-        } catch (Exception ex) {
+        } else {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Invalid Input!");
+                    "Invalid Admin Credentials!");
         }
     }
 }

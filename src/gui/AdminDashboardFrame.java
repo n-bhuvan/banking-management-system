@@ -1,125 +1,265 @@
 package gui;
 
 import javax.swing.*;
-
-import models.Account;
-import services.BankService;
+import javax.swing.table.*;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.sql.*;
 
-public class AdminDashboardFrame extends JFrame implements java.awt.event.ActionListener {
+import utils.DatabaseConnection;
 
-    private JTextArea accountArea;
+public class AdminDashboardFrame
+        extends JFrame {
 
-    private JScrollPane scrollPane;
+    private JTable accountTable;
 
-    private BankService bankService;
+    private DefaultTableModel model;
 
-    private JButton analyticsButton;
+    // Colors
+    private final Color BACKGROUND_COLOR =
+            new Color(24, 26, 27);
+
+    private final Color CARD_COLOR =
+            new Color(40, 44, 52);
+
+    private final Color TEXT_COLOR =
+            Color.WHITE;
+
+    private final Color BUTTON_COLOR =
+            new Color(0, 120, 215);
 
     public AdminDashboardFrame() {
 
-        bankService = new BankService();
-
-        // Frame
         setTitle("Admin Dashboard");
 
-        setSize(600, 500);
-
-        setLayout(new BorderLayout());
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 600);
 
         setLocationRelativeTo(null);
 
-        // Title
-        JLabel titleLabel =
-                new JLabel(
-                        "All Bank Accounts",
-                        SwingConstants.CENTER);
+        setDefaultCloseOperation(
+                JFrame.DISPOSE_ON_CLOSE);
 
-        titleLabel.setFont(
+        getContentPane().setBackground(
+                BACKGROUND_COLOR);
+
+        setLayout(new BorderLayout());
+
+        // Top Panel
+        JPanel topPanel =
+                new JPanel();
+
+        topPanel.setBackground(
+                CARD_COLOR);
+
+        topPanel.setPreferredSize(
+                new Dimension(1000, 80));
+
+        JLabel title =
+                new JLabel(
+                        "Bank Administration Panel");
+
+        title.setFont(
                 new Font("Arial",
                         Font.BOLD,
-                        24));
+                        28));
 
-        add(titleLabel,
-                BorderLayout.NORTH);
+        title.setForeground(
+                TEXT_COLOR);
 
-        analyticsButton =
-                new JButton("Open Analytics");
+        topPanel.add(title);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        // Table
+        String[] columns = {
+
+                "Account Number",
+                "Holder Name",
+                "Balance",
+                "Role"
+        };
+
+        model =
+                new DefaultTableModel(
+                        columns,
+                        0);
+
+        accountTable =
+                new JTable(model);
+
+        accountTable.setRowHeight(30);
+
+        accountTable.setFont(
+                new Font("Arial",
+                        Font.PLAIN,
+                        14));
+
+        accountTable.getTableHeader()
+                .setFont(
+                        new Font("Arial",
+                                Font.BOLD,
+                                15));
+
+        accountTable.setBackground(
+                CARD_COLOR);
+
+        accountTable.setForeground(
+                TEXT_COLOR);
+
+        accountTable.getTableHeader()
+                .setBackground(
+                        BUTTON_COLOR);
+
+        accountTable.getTableHeader()
+                .setForeground(
+                        Color.WHITE);
+
+        JScrollPane scrollPane =
+                new JScrollPane(accountTable);
+
+                JPanel centerPanel =
+                new JPanel(
+                        new BorderLayout());
+
+        centerPanel.setBackground(
+                BACKGROUND_COLOR);
+
+        centerPanel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        20,
+                        20,
+                        20,
+                        20));
+
+        JPanel tableCard =
+                new JPanel(
+                        new BorderLayout());
+
+        tableCard.setBackground(
+                CARD_COLOR);
+
+        tableCard.setBorder(
+                BorderFactory.createCompoundBorder(
+
+                        BorderFactory.createLineBorder(
+                                new Color(70,70,70),
+                                1),
+
+                        BorderFactory.createEmptyBorder(
+                                10,
+                                10,
+                                10,
+                                10)));
+
+        tableCard.add(
+                scrollPane,
+                BorderLayout.CENTER);
+
+        centerPanel.add(
+                tableCard,
+                BorderLayout.CENTER);
+
+        add(centerPanel,
+                BorderLayout.CENTER);
+        // Bottom Panel
+        JPanel bottomPanel =
+                new JPanel();
+        JButton analyticsButton =
+                new JButton("Analytics");
 
         analyticsButton.setFont(
                 new Font("Arial",
                         Font.BOLD,
-                        14));
+                        16));
 
-        add(analyticsButton,
-                BorderLayout.SOUTH);
+        analyticsButton.setBackground(
+                new Color(40,167,69));
 
-        analyticsButton.addActionListener(this);
+        analyticsButton.setForeground(
+                Color.WHITE);
 
-        // Text Area
-        accountArea =
-                new JTextArea();
+        analyticsButton.setFocusPainted(false);
 
-        accountArea.setEditable(false);
+        analyticsButton.addActionListener(
+                e -> new AnalyticsFrame());
 
-        scrollPane =
-                new JScrollPane(accountArea);
+        bottomPanel.add(analyticsButton);
 
-        add(scrollPane,
-                BorderLayout.CENTER);
+        bottomPanel.setBackground(
+                BACKGROUND_COLOR);
 
+        JButton refreshButton =
+                new JButton("Refresh");
+
+        refreshButton.setFont(
+                new Font("Arial",
+                        Font.BOLD,
+                        16));
+
+        refreshButton.setBackground(
+                BUTTON_COLOR);
+
+        refreshButton.setForeground(
+                Color.WHITE);
+
+        refreshButton.setFocusPainted(false);
+
+        refreshButton.addActionListener(
+                e -> loadAccounts());
+
+        bottomPanel.add(refreshButton);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // Load Data
         loadAccounts();
 
         setVisible(true);
     }
 
-    // Load Accounts
     private void loadAccounts() {
 
-        ArrayList<Account> accounts =
-                bankService.getAllAccounts();
+        model.setRowCount(0);
 
-        StringBuilder builder =
-                new StringBuilder();
+        try {
 
-        for (Account account : accounts) {
+            Connection connection =
+                    DatabaseConnection.getConnection();
 
-            builder.append(
-                    "Account Number: ")
-                    .append(account.getAccountNumber())
-                    .append("\n");
+            String query =
+                    "SELECT * FROM accounts";
 
-            builder.append(
-                    "Holder Name: ")
-                    .append(account.getAccountHolderName())
-                    .append("\n");
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
 
-            builder.append(
-                    "Balance: ")
-                    .append(account.getBalance())
-                    .append("\n");
+            ResultSet resultSet =
+                    statement.executeQuery();
 
-            builder.append(
-                    "Role: ")
-                    .append(account.getRole())
-                    .append("\n");
+            while (resultSet.next()) {
 
-            builder.append(
-                    "-----------------------------\n");
+                Object[] row = {
+
+                        resultSet.getLong(
+                                "account_number"),
+
+                        resultSet.getString(
+                                "account_holder_name"),
+
+                        resultSet.getDouble(
+                                "balance"),
+
+                        resultSet.getString(
+                                "role")
+                };
+
+                model.addRow(row);
+            }
+
+            connection.close();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
         }
-
-        accountArea.setText(
-                builder.toString());
-    }
-
-    @Override
-    public void actionPerformed(
-            java.awt.event.ActionEvent e) {
-
-        new AnalyticsFrame();
     }
 }

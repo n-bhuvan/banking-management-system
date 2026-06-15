@@ -1,28 +1,48 @@
 package models;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-public class Transaction implements Serializable {
+public class Transaction {
 
     private String type;
-    private double amount;
-    private LocalDateTime timestamp;
 
-    // Constructor
-    public Transaction(String type, double amount) {
+    private double amount;
+
+    private String date;
+
+    public Transaction(
+            String type,
+            double amount,
+            String date) {
 
         this.type = type;
+
         this.amount = amount;
-        this.timestamp = LocalDateTime.now();
+
+        this.date = date;
     }
 
-    // Display Transaction
-    public void displayTransaction() {
+    public String getType() {
 
-        System.out.println(
-                type +
-                " | Amount: " + amount +
-                " | Time: " + timestamp);
+        return type;
+    }
+
+    public double getAmount() {
+
+        return amount;
+    }
+
+    public String getDate() {
+
+        return date;
+    }
+
+    @Override
+    public String toString() {
+
+        return "Type: "
+                + type
+                + "\nAmount: ₹"
+                + amount
+                + "\nDate: "
+                + date;
     }
 }
