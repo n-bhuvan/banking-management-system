@@ -73,7 +73,7 @@ git clone https://github.com/YOUR_USERNAME/banking-management-system.git
 4. Run:
 
 ```bash id="rjlwm0"
-Main.java
+GuiMain.java
 ```
 
 ---
